@@ -20,14 +20,14 @@ def run_iter(memory_list):
 
             if instr[1] == 0:
                 right_val = memory[memory[i+2]]
-            elif instr[2] == 0:
+            elif instr[1] == 2:
                 right_val = memory[relative_base + memory[i + 2]]
             else:
                 right_val = memory[i+2]
 
             if instr[0] == 0:
                 res_idx = memory[i+3]
-            elif instr[2] == 0:
+            elif instr[0] == 2:
                 res_idx = relative_base + memory[i+3]
             else:
                 raise RuntimeError("Invalid mode for op 1/2(parameter 1 for result)")
@@ -94,7 +94,7 @@ def run_iter(memory_list):
             if instr[1] == 0:
                 second_param = memory[memory[i+2]]
             elif instr[1] == 2:
-                second_param = memory[relative_base + memory[i+1]]
+                second_param = memory[relative_base + memory[i+2]]
             else:
                 second_param = memory[i+2]
 
