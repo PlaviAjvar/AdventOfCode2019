@@ -2,6 +2,12 @@ import itertools
 import collections
 import heapq
 
+##############################################
+# Disclaimer
+# Runs in several hours LOL.
+# It is python though, and the implementation is bitmask Dijkstra without much optimization.
+##############################################
+
 def find_start(triton_map):
     for row_idx in range(len(triton_map)):
         for col_idx in range(len(triton_map[0])):
