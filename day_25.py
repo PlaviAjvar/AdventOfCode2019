@@ -1,14 +1,20 @@
 import collections
-import copy
+
+'''
+Hell naw I ain't coding this shit.
+'''
 
 class intcode_computer:
     def input_value(self):
-        if not self.input_queue:
-            return -1
         return self.input_queue.popleft()
 
     def output_value(self, value):
+        print(chr(value), end="")
         self.output_queue.append(value)
+
+    def input_command(self, command):
+        for element in command:
+            self.input_queue.append(element)
 
     def run_iter(self):
         while True:
@@ -43,6 +49,12 @@ class intcode_computer:
                 self.i += 4
 
             elif instr[4] == 3: # input
+                if not self.input_flag and not self.input_queue:
+                    self.input_flag = True
+                    return
+                else:
+                    self.input_flag = False
+
                 if instr[2] == 0:
                     res_idx = self.memory[self.i+1]
                 elif instr[2] == 2:
@@ -53,7 +65,6 @@ class intcode_computer:
                 self.memory[res_idx] = self.input_value()
                 self.i += 2
                 self.output_flag = False
-                return
 
             elif instr[4] == 4: # output
                 if instr[2] == 0:
@@ -66,7 +77,6 @@ class intcode_computer:
                 self.output_value(value)
                 self.i += 2
                 self.output_flag = True
-                return
 
             elif instr[4] == 5 or instr[4] == 6: # jump if true/false
                 if instr[2] == 0:
@@ -135,50 +145,35 @@ class intcode_computer:
             else:
                 raise RuntimeError("Something went horribly wrong")
 
-    def __init__(self, memory_list, network_address):
+    def __init__(self, memory_list):
         size = len(memory_list)
         memory_temp = {i : memory_list[i] for i in range(size)}
         self.memory = collections.defaultdict(int, memory_temp)
         self.relative_base = 0
         self.i = 0
         self.input_queue = collections.deque()
-        self.input_queue.append(network_address)
         self.output_queue = collections.deque()
         self.output_flag = False
+        self.input_flag = False
 
-def run_network(memory_list):
-    num_computers = 50
-    network = [intcode_computer(memory_list, computer) for computer in range(num_computers)]
-    for computer in range(num_computers):
-        network[computer].run_iter()
-        network[computer].run_iter()
+def str_to_command(str):
+    command = [ord(char) for char in str] + [ord("\n")]
+    return command
+
+def run_program(memory_list):
+    computer = intcode_computer(memory_list)
 
     while True:
-        for computer in range(num_computers):
-            network[computer].run_iter()
-            if network[computer].output_flag:
-                while len(network[computer].output_queue) % 3 != 0:
-                    network[computer].run_iter()
-                    
-                address = network[computer].output_queue.popleft()
-                x = network[computer].output_queue.popleft()
-                y = network[computer].output_queue.popleft()
-
-                if address == 255:
-                    print("The y value of the first packet sent to address 255 is", y)
-                    return
-
-                network[address].input_queue.append(x)
-                network[address].input_queue.append(y)
-
-            elif network[computer].input_queue:
-                network[computer].run_iter()
+        computer.run_iter()
+        command_str = input()
+        command = str_to_command(command_str)
+        computer.input_command(command)
 
 
 if __name__ == "__main__":
     file = open("input.txt","r")
     memory = list(map(int, file.read().split(",")))
     try:
-        run_network(memory)
+        run_program(memory)
     except Exception as exc:
         print(exc)

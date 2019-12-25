@@ -1,12 +1,6 @@
 import collections
 import copy
 
-'''
-Doesn't work.
-Dunno why.
-'''
-
-
 class intcode_computer:
     def input_value(self):
         if not self.input_queue:
